@@ -1,18 +1,13 @@
 const {con} = require("./DBConnect")
 
-const addData = async (data) => {
-    console.log(data)
+const removeData = async (data) => {
     // Error handler
     const ErrorHandler = (err) => {
         console.log(err.errno)
-        if(err.errno == "1062"){
-            return(`Item that you are trying to register, already exists in database. If you are trying to edit that item, go to "edit items in stock"`)
-        } else {
-            return(`Seems like we have an error. Developer information ${err.errno}`)
-        }
+        return(`Seems like we have an error. Developer information ${err.errno}`)
     }
 
-    let query = `INSERT INTO Test VALUES (null, '${data.name}', '${data.code}' )`
+    let query = `DELETE FROM Test WHERE id = ${data}`
 
     // Get request from database
     const AddReq = async (data) => {
@@ -33,5 +28,5 @@ const addData = async (data) => {
 }
 
 module.exports = {
-    addData
+    removeData
 }

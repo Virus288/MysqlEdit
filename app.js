@@ -6,13 +6,16 @@ const express = require('express')
 const {getData} = require("./Database/GetData");
 const {updateData} = require("./Database/UpdateData");
 const {addData} = require("./Database/AddData");
+const {removeData} = require("./Database/RemoveData");
 
 const app = express();
 app.set('view engine', 'ejs');
+app.set('views');
 
 // middleware
-app.use(express.static('public'));
+app.use("/public", express.static('public'))
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }))
 
 app.listen(3500, console.log("App is listening on port 3500"))
 
@@ -39,6 +42,16 @@ app.get("/updateData", function(req, res){
         updateData({id: req.query.id, name: req.query.name, code: req.query.code})
             .then(data => res.redirect('/'))
             .catch((err) => res.send({message: err, type: "error"}));
+    } else {
+        getData().then(data => res.render('home', {data: data}));
+    }
+});
+
+app.post("/removeData", function(req, res){
+    if(req.body.id){
+        removeData(req.body.id)
+            .then(data => res.send({message: data, type: "success"}))
+            .catch(err => res.send({message: err, type: "error"}));
     } else {
         getData().then(data => res.render('home', {data: data}));
     }
