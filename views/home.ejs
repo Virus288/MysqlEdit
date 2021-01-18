@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+
+<style>
+    .upperData {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 3%;
+    }
+
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+</style>
+<body>
+    <div class="upperData">
+        <h1>Data</h1>
+        <h1 class="BackInfo"></h1>
+
+        <div class="find">
+            <h2>Find data</h2>
+            <form action="/" method="GET">
+                <label for="id">Id</label>
+                <input type="text" id="id" name="id" required>
+                <button type="submit">Search</button>
+            </form>
+            <button onclick="window.location.href='http://localhost:3500'">Show all data</button>
+        </div>
+
+        <div class="add">
+            <h2>Add data</h2>
+            <form action="/addData" method="GET">
+                <label htmlFor="name">name</label>
+                <input type="text" name="name" required />
+                <label htmlFor="code">Code</label>
+                <input type="text" name="code" required />
+                <button>Create</button>
+            </form>
+        </div>
+
+        <div class="update">
+            <h2>Update</h2>
+            <form action="/updateData" method="GET">
+                <label htmlFor="id">Id</label>
+                <input type="text" name="id" required />
+                <label htmlFor="name">Name</label>
+                <input type="text" name="name" required />
+                <label htmlFor="code">Code</label>
+                <input type="text" name="code" required />
+                <button>Create</button>
+            </form>
+        </div>
+
+    </div>
+    <% if(Object.keys(locals.data).length !== 0) { %>
+        <table>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Code</th>
+            </tr>
+            <% let keys = Object.keys(locals.data[0])
+            for(let x=0;x < locals.data.length ;x++){ %>
+                <tr>
+                <% for(let i=0; i < keys.length; i++){ %>
+                    <td><%- locals.data[x][keys[i]] %></td>
+            <% } %>
+                </tr>
+           <% } %>
+        </table>
+    <% } else { %>
+        <h3>No data</h3>
+    <% } %>
+</body>
+</html>
