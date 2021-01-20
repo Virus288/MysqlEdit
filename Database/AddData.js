@@ -1,7 +1,6 @@
 const {con} = require("./DBConnect")
 
 const addData = async (data) => {
-    console.log(data)
     // Error handler
     const ErrorHandler = (err) => {
         console.log(err.errno)
@@ -12,10 +11,15 @@ const addData = async (data) => {
         }
     }
 
-    let query = `INSERT INTO Test VALUES (null, '${data.name}', '${data.code}' )`
+    let query;
 
+    if(data.database === "Test"){
+        query = `INSERT INTO ${data.database} VALUES (null, '${data.code}', '${data.name}' )`
+    } else {
+        query = `INSERT INTO ${data.database} VALUES (null, '${data.code}', '${data.price}' )`
+    }
     // Get request from database
-    const AddReq = async (data) => {
+    const AddReq = async () => {
         return new Promise((resolve, reject) => {
             con.query(query, (err, results) => {
                 if (err){
@@ -28,7 +32,7 @@ const addData = async (data) => {
     }
 
     let Data;
-    await AddReq(data).then(data => Data=data);
+    await AddReq().then(data => Data=data);
     return Data
 }
 

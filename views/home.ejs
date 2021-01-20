@@ -33,7 +33,6 @@
 <script>
     const SendData = () => {
     let form = document.querySelectorAll(".remove");
-    console.log(form)
     form.forEach(data => {
         data.addEventListener("click", (e) => {
             let id = e.target.parentElement.id
@@ -41,10 +40,11 @@
         })
     })
         const Sand = async (id) => {
+        let database = document.querySelector('.database').value;
             try {
                 const res = await fetch(`http://localhost:3500/removeData`, {
                     method: "POST",
-                    body: JSON.stringify({id}),
+                    body: JSON.stringify({id, database}),
                     headers: {'Content-Type': 'application/json'}
                 });
                 const data = await res.json();
@@ -58,34 +58,99 @@
         }
 
     }
+
+    const InnerJoin = () => {
+        document.querySelector(".InnerJoin").addEventListener('click', () => {
+            location.href=`http://localhost:3500/InnerJoin`
+        })
+    }
+
+    const SelectDatabase = () => {
+        document.querySelector('.database').addEventListener("change", (e) => {
+            location.href=`http://localhost:3500?database=${e.target.value}`
+        })
+    }
+
+    const SearchForm = () => {
+        let form = document.querySelector('.SearchForm')
+        form.addEventListener("submit", (e) => {
+            e.preventDefault()
+            let id = e.target['id'].value
+            <% if(locals.database) { %>
+                location.href=`http://localhost:3500?database=<%- locals.database %>&id=${id}`
+            <% } else { %>
+                location.href=`http://localhost:3500?database=Test&id=${id}`
+            <% } %>
+        })
+    }
+
+    const ShowAllData = () => {
+        let data = document.querySelector('.ShowAllData')
+        data.addEventListener("click", (e) => {
+            e.preventDefault()
+            <% if(locals.database) { %>
+            location.href=`http://localhost:3500?database=<%- locals.database %>`
+            <% } else { %>
+            location.href=`http://localhost:3500?database=Test`
+            <% } %>
+        })
+    }
+
     setTimeout(() => {
         SendData()
+        ShowAllData()
+        SearchForm()
+        InnerJoin()
+        SelectDatabase()
     }, 100)
-
-
 </script>
 <body>
+    <label for='database'>DataBase</label><br>
+    <select name="database" class='database'>
+        <% if(locals.database == "Test"){%>
+        <option value="Test">Test</option>
+        <option value="Test2">Test2</option>
+        <% } else if(locals.database == "Test2") { %>
+        <option value="Test2">Test2</option>
+        <option value="Test">Test</option>
+        <% } else { %>
+        <option value="Test">Test</option>
+        <option value="Test2">Test2</option>
+        <% } %>
+    </select>
     <div class="upperData">
         <h1>Data</h1>
         <h1 class="BackInfo"></h1>
 
         <div class="find">
             <h2>Find data</h2>
-            <form action="/" method="GET">
+            <form class="SearchForm">
                 <label for="id">Id</label>
                 <input type="text" id="id" name="id" required>
                 <button type="submit">Search</button>
             </form>
-            <button onclick="window.location.href='http://localhost:3500'">Show all data</button>
+            <button class="ShowAllData">Show all data</button>
+            <button class="InnerJoin" onclick="window.location.href='http://localhost:3500'">Show connected data</button>
         </div>
 
         <div class="add">
             <h2>Add data</h2>
             <form action="/addData" method="GET">
-                <label htmlFor="name">name</label>
-                <input type="text" name="name" required />
-                <label htmlFor="code">Code</label>
-                <input type="text" name="code" required />
+                <% if(locals.database == "Test"){%>
+                    <label htmlFor="code">Code</label>
+                    <input type="text" name="code" required />
+                    <label htmlFor="name">Name</label>
+                    <input type="text" name="name" required />
+
+                    <input type="text" name="database" value="<%- locals.database %>" style="display: none"/>
+                <% } else if(locals.database == "Test2") { %>
+                    <label htmlFor="code">Code</label>
+                    <input type="text" name="code" required />
+                    <label htmlFor="price">Price</label>
+                    <input type="text" name="price" required />
+
+                    <input type="text" name="database" value="<%- locals.database %>" style="display: none"/>
+                <% } %>
                 <button>Create</button>
             </form>
         </div>
@@ -93,34 +158,49 @@
         <div class="update">
             <h2>Update</h2>
             <form action="/updateData" method="GET">
-                <label htmlFor="id">Id</label>
-                <input type="text" name="id" required />
-                <label htmlFor="name">Name</label>
-                <input type="text" name="name" required />
-                <label htmlFor="code">Code</label>
-                <input type="text" name="code" required />
+                <% if(locals.database == "Test"){%>
+                    <label htmlFor="id">Id</label>
+                    <input type="text" name="id" required />
+                    <label htmlFor="name">Name</label>
+                    <input type="text" name="name" required />
+                    <label htmlFor="code">Code</label>
+                    <input type="text" name="code" required />
+
+                    <input type="text" name="database" value="<%- locals.database %>" style="display: none"/>
+                <% } else if(locals.database == "Test2") { %>
+                    <label htmlFor="id">Id</label>
+                    <input type="text" name="id" required />
+                    <label htmlFor="code">Code</label>
+                    <input type="text" name="code" required />
+                    <label htmlFor="price">Price</label>
+                    <input type="text" name="price" required />
+
+                    <input type="text" name="database" value="<%- locals.database %>" style="display: none"/>
+                <% } %>
                 <button>Create</button>
             </form>
         </div>
 
     </div>
-    <% if(Object.keys(locals.data).length !== 0) { %>
+    <% if(Object.keys(locals.data).length !== 0) {
+        let keys = Object.keys(locals.data[0]) %>
         <table>
             <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Code</th>
+                <th><%- keys[0] %></th>
+                <th><%- keys[1] %></th>
+                <th><%- keys[2] %></th>
                 <th>Remove</th>
             </tr>
-            <% let keys = Object.keys(locals.data[0])
+            <%
             for(let x=0;x < locals.data.length ;x++){ %>
                 <tr>
                 <% for(let i=0; i < keys.length; i++){ %>
                     <td><%- locals.data[x][keys[i]] %></td>
             <% } %>
-                <td id="<%- locals.data[x]['id'] %>"><Button class="remove">Remove</Button></td>
+                <td id="<%- locals.data[x]['id'] %>"><button class="remove">Remove</button></td>
                 </tr>
            <% } %>
+            <div class="database" style="display: none"><%- locals.database %></div>
         </table>
     <% } else { %>
         <h3>No data</h3>

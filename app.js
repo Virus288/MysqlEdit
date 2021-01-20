@@ -7,6 +7,7 @@ const {getData} = require("./Database/GetData");
 const {updateData} = require("./Database/UpdateData");
 const {addData} = require("./Database/AddData");
 const {removeData} = require("./Database/RemoveData");
+const {InnerJoin} = require("./Database/InnerJoin")
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -20,16 +21,30 @@ app.use(express.urlencoded({ extended: false }))
 app.listen(3500, console.log("App is listening on port 3500"))
 
 app.get('/', function(req, res){
+    if(req.query.database !== "Test"){
+        if(req.query.database !== "Test2"){
+            req.query.database = "Test";
+        }
+    }
     if(req.query.id){
-        getData(req.query.id).then(data => res.render('home', {data: data}));
+        getData(req.query.id, req.query.database).then(data => res.render('home', {data: data, database: req.query.database}));
     } else {
-        getData().then(data => res.render('home', {data: data}));
+        getData(null, req.query.database).then(data => res.render('home', {data: data, database: req.query.database}));
     }
 });
 
+app.get('/innerjoin', function(req, res){
+    InnerJoin().then(data => res.render('home', {data: data}));
+});
+
 app.get("/addData", function(req, res){
-    if(req.query.name && req.query.code){
-        addData({name: req.query.name, code: req.query.code})
+    if(req.query.name && req.query.code || req.query.code && req.query.price){
+        if(req.query.database !== "Test"){
+            if(req.query.database !== "Test2"){
+                req.query.database = "Test";
+            }
+        }
+        addData({name: req.query.name, code: req.query.code, database: req.query.database, price: req.query.price})
             .then(data => res.redirect('/'))
             .catch((err) => res.send({message: err, type: "error"}));
     } else {
@@ -38,8 +53,8 @@ app.get("/addData", function(req, res){
 });
 
 app.get("/updateData", function(req, res){
-    if(req.query.id && req.query.code && req.query.name){
-        updateData({id: req.query.id, name: req.query.name, code: req.query.code})
+    if(req.query.id && req.query.code && req.query.name || req.query.id && req.query.code && req.query.price){
+        updateData({id: req.query.id, name: req.query.name, code: req.query.code, price: req.query.price, database: req.query.database})
             .then(data => res.redirect('/'))
             .catch((err) => res.send({message: err, type: "error"}));
     } else {
@@ -48,8 +63,8 @@ app.get("/updateData", function(req, res){
 });
 
 app.post("/removeData", function(req, res){
-    if(req.body.id){
-        removeData(req.body.id)
+    if(req.body.id, req.body.database){
+        removeData(req.body.id, req.body.database)
             .then(data => res.send({message: data, type: "success"}))
             .catch(err => res.send({message: err, type: "error"}));
     } else {

@@ -1,13 +1,14 @@
 const {con} = require("./DBConnect")
 
-const removeData = async (data) => {
+const removeData = async (data, database) => {
+    console.log(data, database)
     // Error handler
     const ErrorHandler = (err) => {
         console.log(err.errno)
         return(`Seems like we have an error. Developer information ${err.errno}`)
     }
 
-    let query = `DELETE FROM Test WHERE id = ${data}`
+    let query = `DELETE FROM ${database} WHERE id = ${data}`
 
     // Get request from database
     const AddReq = async (data) => {
@@ -23,7 +24,7 @@ const removeData = async (data) => {
     }
 
     let Data;
-    await AddReq(data).then(data => Data=data);
+    await AddReq(data, database).then(data => Data=data);
     return Data
 }
 

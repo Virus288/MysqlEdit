@@ -1,7 +1,6 @@
 const {con} = require("./DBConnect")
 
 const updateData = async (data) => {
-    console.log(data)
     // Error handler
     const ErrorHandler = (err) => {
         console.log(err)
@@ -12,7 +11,13 @@ const updateData = async (data) => {
         }
     }
 
-    let query = `Update Test SET name = '${data.name}' WHERE id = ${data.id}`
+    let query;
+
+    if(data.database === "Test"){
+        query = `Update ${data.database} SET code = '${data.code}', name = '${data.name}' where id = '${data.id}'`
+    } else {
+        query = `Update ${data.database} SET code = '${data.code}', price = '${data.price}' where id = '${data.id}'`
+    }
 
     // Get request from database
     const AddReq = async (category, data) => {

@@ -1,6 +1,6 @@
 const {con} = require("./DBConnect")
 
-const getData = async (data) => {
+const getData = async (data, database) => {
     // Error handler
     const ErrorHandler = (errno) => {
         if(errno.errno === 1054){
@@ -10,9 +10,9 @@ const getData = async (data) => {
     }
 
     // Get request from database
-    const GetReq = async (data, dataType) => {
+    const GetReq = async (data, dataType, database) => {
         if(data === "all"){
-            let query = `SELECT * FROM Test`
+            let query = `SELECT * FROM ${database}`
             return new Promise((resolve, reject) => {
                 con.query(query, (err, results) => {
                     if (err){
@@ -23,7 +23,7 @@ const getData = async (data) => {
                 });
             }).catch((err) => ErrorHandler(err));
         } else {
-            let query = `SELECT * FROM Test WHERE ${dataType} = '${data}'`
+            let query = `SELECT * FROM ${database} WHERE ${dataType} = '${data}'`
             return new Promise((resolve, reject) => {
                 con.query(query, (err, results) => {
                     if (err){
@@ -36,13 +36,21 @@ const getData = async (data) => {
         }
     }
 
-    if(data === undefined){
+    if(data === undefined || data === null && database === undefined){
         let Data;
-        await GetReq("all", "id").then(data => Data=data);
+        await GetReq("all", "id", "Test").then(data => Data=data);
+        return Data
+    } else if(database !== undefined && data === null){
+        let Data;
+        await GetReq("all", "id", database).then(data => Data=data);
+        return Data
+    } else if(database !== undefined && data !== null){
+        let Data;
+        await GetReq(data, "id", database).then(data => Data=data);
         return Data
     } else {
         let Data;
-        await GetReq(data, "id").then(data => Data=data);
+        await GetReq(data, "id", "Test").then(data => Data=data);
         return Data
     }
 
