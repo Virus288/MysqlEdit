@@ -34,7 +34,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/innerjoin', function(req, res){
-    InnerJoin().then(data => res.render('home', {data: data}));
+    InnerJoin().then(data => res.render('home', {data: data, url: "http://localhost:3500/InnerJoin"}));
 });
 
 app.get("/addData", function(req, res){
